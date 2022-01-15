@@ -7,6 +7,7 @@
 
 #include "Modules/Modules.h"
 #include "Modules/Processing/ProcessingUtils/ProcessingUtils.h"
+#include <qnamespace.h>
 
 class MouseAndKeyboard : public Processing {
  public:
@@ -30,6 +31,9 @@ class MouseAndKeyboard : public Processing {
       Parameters::Arg<Qt::Key> goToPointKey = Qt::Key_T;
       Parameters::Arg<Qt::Key> rotateInPointKey = Qt::Key_U;
       Parameters::Arg<Qt::Key> rotateOnSelfKey = Qt::Key_I;
+      Parameters::Arg<Qt::Key> rotateToBallKey = Qt::Key_B;
+      Parameters::Arg<Qt::Key> goToBallKey = Qt::Key_G;
+      Parameters::Arg<Qt::Key> kickKey = Qt::Key_K;
     };
 
     struct VSS {

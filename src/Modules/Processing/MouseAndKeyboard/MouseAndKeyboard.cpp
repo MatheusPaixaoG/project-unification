@@ -3,6 +3,8 @@
 //
 
 #include "MouseAndKeyboard.h"
+#include "Packages/Command/Command.h"
+#include "Packages/SSLRobotCommand/SSLRobotCommand.h"
 
 MouseAndKeyboard::MouseAndKeyboard(int index, QThreadPool* threadPool) :
     Processing(index, threadPool) {
@@ -80,6 +82,9 @@ void MouseAndKeyboard::exec() {
   if (!field || !frame || !robot || !mouse) {
     return;
   }
+  if (!frame->has_ball()) {
+    return;
+  }
 
   if (args.league == Args::League::SSL) {
     ssl();
@@ -112,6 +117,38 @@ void MouseAndKeyboard::ssl() {
     SSLMotion::RotateOnSelf rotateOnSelf((mouse.value() - robot->position()).angle());
     auto command = sslNavigation.run(robot.value(), SSLRobotCommand(rotateOnSelf));
     emit sendCommand(command);
+  } else if (keys.contains(args.ssl.rotateToBallKey)) {
+    SSLMotion::RotateOnSelf rotateToBall((frame->ball().position() - robot->position()).angle());
+    auto command = sslNavigation.run(robot.value(), SSLRobotCommand(rotateToBall));
+    emit sendCommand(command);
+  } else if (keys.contains(args.ssl.kickKey)) {
+    SSLMotion::RotateOnSelf rotateToBall((frame->ball().position() - robot->position()).angle());
+    auto command = sslNavigation.run(robot.value(), SSLRobotCommand(rotateToBall));
+    command.set_front(true);
+    command.set_kickSpeed(100);
+    emit sendCommand(command);
+  } else if (keys.contains(args.ssl.goToBallKey)) {
+    if (robot->distSquaredTo(frame->ball().position()) <=
+        1.49712e+04) { // Verifica se o robô está com a bola
+      SSLMotion::GoToPoint motion(field->center(),
+                                  (field->enemyGoalInsideBottom() - robot->position()).angle(),
+                                  true);
+      SSLRobotCommand command(motion);
+      command.set_dribbler(true);
+      if (robot->distSquaredTo(field->center()) <= 1.49712e+04) {
+        command.set_dribbler(false);
+        command.set_front(true); // O front = true é que faz o robô chutar
+        command.set_kickSpeed(100);
+      }
+      emit sendCommand(sslNavigation.run(robot.value(), command));
+    } else {
+      SSLMotion::GoToPoint motion(frame->ball().position(),
+                                  (frame->ball().position() - robot->position()).angle(),
+                                  true);
+      SSLRobotCommand command(motion);
+      command.set_dribbler(true);
+      emit sendCommand(sslNavigation.run(robot.value(), command));
+    }
   } else {
     emit sendCommand(SSLCommand::halt(index()));
   }
