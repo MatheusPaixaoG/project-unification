@@ -23,6 +23,7 @@ class CustomPlayer : public Processing {
     SharedOptional<Frame> frame;
     SharedOptional<Robot> robot;
     SharedOptional<Field> field;
+    SharedOptional<Point> target = Point(0.0, 0.0);
     SharedValue<QSet<Qt::Key>> keys;
   };
   SharedWrapper<Shared, std::mutex> shared;
@@ -30,6 +31,7 @@ class CustomPlayer : public Processing {
   std::optional<Field> field;
   std::optional<Frame> frame;
   std::optional<Robot> robot;
+  std::optional<Point> target;
 
   SSLNavigation sslNavigation;
   VSSNavigation vssNavigation;
@@ -37,6 +39,7 @@ class CustomPlayer : public Processing {
  private slots:
   void receiveField(const Field& field);
   void receiveFrame(const Frame& frame);
+  void receiveTarget(const Point& target);
 };
 
 #endif // PROJECT_UNIFICATION_CUSTOMPLAYER_H
