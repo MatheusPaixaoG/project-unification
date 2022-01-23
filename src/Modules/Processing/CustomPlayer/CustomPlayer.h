@@ -1,6 +1,7 @@
 #ifndef PROJECT_UNIFICATION_CUSTOMPLAYER_H
 #define PROJECT_UNIFICATION_CUSTOMPLAYER_H
 
+#include "./RRTstar/RRTstar.h"
 #include "Modules/Modules.h"
 #include "Modules/Processing/ProcessingUtils/ProcessingUtils.h"
 
@@ -23,7 +24,7 @@ class CustomPlayer : public Processing {
     SharedOptional<Frame> frame;
     SharedOptional<Robot> robot;
     SharedOptional<Field> field;
-    SharedOptional<Point> target = Point(0.0, 0.0);
+    SharedOptional<Point> target = Point(-4500, -3000);
     SharedValue<QSet<Qt::Key>> keys;
   };
   SharedWrapper<Shared, std::mutex> shared;
