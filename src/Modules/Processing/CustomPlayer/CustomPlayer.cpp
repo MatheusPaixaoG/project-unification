@@ -57,7 +57,7 @@ void CustomPlayer::exec() {
     if (targ.distTo(shared->target.get()) >= 20.0) {
       receiveTarget(targ);
       RRTSTAR* rrtstar = new RRTSTAR;
-      rrtstar->setMaxIterations(800);
+      rrtstar->setMaxIterations(1500);
       rrtstar->setStepSize(75);
       cout << "robot->position(): (" << robot->position().x() << ", " << robot->position().y()
            << ")" << endl;
@@ -68,10 +68,10 @@ void CustomPlayer::exec() {
       // setFinalPos(frame->ball().position());
       // rrtstar->setEndPos(frame->ball().position());
 
-      cout << "nodes antes: " << endl;
-      for (int g = 0; g < (int) rrtstar->nodes.size(); g++) {
-        cout << "rrtstar->nodes[" << g << "]: (" << rrtstar->nodes[g]->position.x() << ", "
-             << rrtstar->nodes[g]->position.y() << ")" << endl;
+      cout << "path antes: " << endl;
+      for (int g = 0; g < (int) rrtstar->path.size(); g++) {
+        cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
+             << rrtstar->path[g]->position.y() << ")" << endl;
       }
       // RRTSTAR Algorithm
       for (int i = 0; i < rrtstar->max_iter; i++) {
@@ -136,10 +136,24 @@ void CustomPlayer::exec() {
         qApp->processEvents();
       }
 
-      cout << "nodes depois: " << endl;
-      for (int g = 0; g < (int) rrtstar->nodes.size(); g++) {
-        cout << "rrtstar->nodes[" << g << "]: (" << rrtstar->nodes[g]->position.x() << ", "
-             << rrtstar->nodes[g]->position.y() << ")" << endl;
+      Node* q;
+      if (rrtstar->reached()) {
+        q = rrtstar->lastNode;
+      } else {
+        // if not reached yet, then shortestPath will start from the closest node to end point.
+        q = rrtstar->nearest(rrtstar->endPos);
+        cout << "Exceeded max iterations!" << endl;
+      }
+      // generate shortest path to destination.
+      while (q != NULL) {
+        rrtstar->path.push_back(q);
+        q = q->parent;
+      }
+
+      cout << "path depois: " << endl;
+      for (int g = 0; g < (int) rrtstar->path.size(); g++) {
+        cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
+             << rrtstar->path[g]->position.y() << ")" << endl;
       }
     }
   }

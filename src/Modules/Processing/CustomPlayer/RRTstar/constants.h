@@ -16,7 +16,7 @@ const float BOT_CLEARANCE = 1.5 * BOT_RADIUS;
 const float BOT_TURN_RADIUS = 7;
 const float RRTSTAR_NEIGHBOR_FACTOR = 3;
 const bool BOT_FOLLOW_DUBIN = false;
-const double GOAL_SAMPLING_PROB = 0.1;
+const double GOAL_SAMPLING_PROB = 0.05;
 const int RADIUS = 5;
 
 // void setInitialPos(Point startPosition) {

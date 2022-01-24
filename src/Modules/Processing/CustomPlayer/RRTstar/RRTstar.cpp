@@ -1,7 +1,7 @@
 #include "RRTstar.h"
 #include <random>
 
-const double EPS = 1e-5;
+const double EPS = 1e-6;
 bool pathFound = false;
 
 RRTSTAR::RRTSTAR() {
