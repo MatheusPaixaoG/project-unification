@@ -18,25 +18,17 @@ void Obstacles::addObstacle(Point firstPoint, Point secondPoint) {
     secondPoint = tmp;
   } else if (firstPoint.x() < secondPoint.x() && firstPoint.y() > secondPoint.y()) {
     int height = firstPoint.y() - secondPoint.y();
-    // firstPoint.y() -= height;
     firstPoint.setY(firstPoint.y() - height);
-    // secondPoint.y() += height;
     secondPoint.setY(secondPoint.y() + height);
   } else if (firstPoint.x() > secondPoint.x() && firstPoint.y() < secondPoint.y()) {
     int length = firstPoint.x() - secondPoint.x();
-    // firstPoint.x() -= length;
     firstPoint.setX(firstPoint.x() - length);
-    // secondPoint.x() += length;
     secondPoint.setX(secondPoint.x() + length);
   }
   firstPoint.setX(firstPoint.x() - BOT_CLEARANCE);
   firstPoint.setY(firstPoint.y() - BOT_CLEARANCE);
   secondPoint.setX(secondPoint.x() + BOT_CLEARANCE);
   secondPoint.setY(secondPoint.y() + BOT_CLEARANCE);
-  // firstPoint.x() -= BOT_CLEARANCE;
-  // firstPoint.y() -= BOT_CLEARANCE;
-  // secondPoint.x() += BOT_CLEARANCE;
-  // secondPoint.y() += BOT_CLEARANCE;
   obstacles.push_back(make_pair(firstPoint, secondPoint));
 }
 

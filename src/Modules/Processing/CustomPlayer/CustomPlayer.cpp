@@ -25,6 +25,7 @@ void CustomPlayer::connectModules(const Modules* modules) {
 }
 
 void CustomPlayer::init(const Modules* modules) {
+  pathKey.setup(modules->gui()->gameVisualizer());
 }
 
 void CustomPlayer::update() {
@@ -47,9 +48,7 @@ void CustomPlayer::exec() {
   if (!frame.has_value()) {
     return;
   }
-  // std::cout << robot->distSquaredTo(frame->ball().position());
   double distRobotBall = robot->distSquaredTo(frame->ball().position());
-  // double distRobotHasball = pow((robot->position() - frame->ball().position()).norm(), 2);
   bool ballWithRobot = distRobotBall <= 1.49712e+04;
   Point targ = field->enemyPenaltyAreaCenter();
   // receiveTarget(field->bottomLeft());
@@ -304,26 +303,14 @@ void CustomPlayer::exec() {
                                    frame->allies().at(o).position().y() - BOT_RADIUS);
           rrtstar->obstacles->addObstacle(topRight, bottomLeft);
         }
-        // for (int k = 0; k < (int) rrtstar->obstacles->obstacles.size(); k++) {
-        //   cout << "rrtstar->obstacles->obstacles[" << k << "].first: ("
-        //        << rrtstar->obstacles->obstacles[k].first.x() << ", "
-        //        << rrtstar->obstacles->obstacles[k].first.y() << ")" << endl;
-        //   cout << "rrtstar->obstacles->obstacles[" << k << "].second: ("
-        //        << rrtstar->obstacles->obstacles[k].second.x() << ", "
-        //        << rrtstar->obstacles->obstacles[k].second.y() << ")" << endl;
-        // }
-        rrtstar->setMaxIterations(10000);
+        rrtstar->setMaxIterations(1800);
         rrtstar->setStepSize(100);
         cout << "field->enemyPenaltyAreaCenter(): (" << field->enemyPenaltyAreaCenter().x() << ", "
              << field->enemyPenaltyAreaCenter().y() << ")" << endl;
         cout << "robot->position(): (" << robot->position().x() << ", " << robot->position().y()
              << ")" << endl;
-        // setInitialPos(robot->position());
-        // rrtstar->setStartPos(robot->position());
         cout << "frame->ball().position(): (" << frame->ball().position().x() << ", "
              << frame->ball().position().y() << ")" << endl;
-        // setFinalPos(frame->ball().position());
-        // rrtstar->setEndPos(frame->ball().position());
 
         cout << "path antes: " << endl;
         for (int g = 0; g < (int) rrtstar->path.size(); g++) {
@@ -337,22 +324,14 @@ void CustomPlayer::exec() {
             Node* qNearest = rrtstar->nearest(q->position);
             if (rrtstar->distance(q->position, qNearest->position) > rrtstar->step_size) {
               Point newConfigPosOrient;
-              // DubinsPath path;
-              if (BOT_FOLLOW_DUBIN) {
-                // newConfigPosOrient = rrtstar->newDubinConfig(q, qNearest, path);
-              } else {
-                newConfigPosOrient = rrtstar->newConfig(q, qNearest);
-              }
+              newConfigPosOrient = rrtstar->newConfig(q, qNearest);
               Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
               if (!rrtstar->obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
                 Node* qNew = new Node;
                 qNew->position = newConfigPos;
                 qNew->orientation = newConfigPosOrient.angle();
-                // qNew->path = path;
-
                 vector<Node*> Qnear;
                 rrtstar->near(qNew->position, rrtstar->step_size * RRTSTAR_NEIGHBOR_FACTOR, Qnear);
-                // qDebug() << "Found Nearby " << Qnear.size() << "\n";
                 Node* qMin = qNearest;
                 double cmin = rrtstar->Cost(qNearest) + rrtstar->PathCost(qNearest, qNew);
                 for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
@@ -387,10 +366,8 @@ void CustomPlayer::exec() {
           }
           if (rrtstar->reached()) {
             cout << "Reached destination" << endl;
-            // ui->statusBox->setText(tr("Reached Destination!"));
             break;
           }
-          // renderArea->update();
           qApp->processEvents();
         }
 
@@ -414,9 +391,16 @@ void CustomPlayer::exec() {
           cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
                << rrtstar->path[g]->position.y() << ")" << endl;
           cout << "pathNodes.size(): " << pathNodes.size() << endl;
-          // cout << "pathNodesList[" << g << "]: (" << pathNodesList->at(g).x() << ", "
-          //      << pathNodesList->at(g).y() << ")" << endl;
         }
+        pathKey.draw([path = pathNodes](GameVisualizerPainter2D* f) {
+          if (!path.empty()) {
+            for (int i = 0; i < path.size() - 1; ++i) {
+              f->drawFilledCircle(path[i], 30, Color::Magenta);
+              f->drawLine(path[i], path[i + 1], Color::Red, 10);
+            }
+            f->drawFilledCircle(path.back(), 30, Color::Magenta);
+          }
+        });
 
         // for (int g = (int) pathNodes.size() - 1; g > -1; g--) {
         //   Point objective = pathNodes.at(g);
@@ -457,7 +441,7 @@ void CustomPlayer::exec() {
       receiveCurrentNode(shared->currentNode.value() - 1);
       receiveObjective(pathNodes.at(shared->currentNode.value()));
     }
-    SSLMotion::GoToPoint motion(field->enemyPenaltyAreaCenter(),
+    SSLMotion::GoToPoint motion(shared->objective.value(),
                                 (field->enemyGoalInsideBottom() - robot->position()).angle(),
                                 true);
     // cout << "ballWithRobot depois do GoToPoint\n";

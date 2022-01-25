@@ -39,6 +39,7 @@ class CustomPlayer : public Processing {
   std::optional<vector<Point>> pathNodesList;
   std::optional<Point> objective;
   std::optional<int> currentNode;
+  GameVisualizer::Key pathKey;
 
   SSLNavigation sslNavigation;
   VSSNavigation vssNavigation;

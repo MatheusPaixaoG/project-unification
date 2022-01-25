@@ -9,7 +9,6 @@
 #include "constants.h"
 #include "soccer-common/Extends/QPoint/ExtendsQPoint.h"
 
-// using namespace Eigen;
 using namespace std;
 
 class Obstacles {

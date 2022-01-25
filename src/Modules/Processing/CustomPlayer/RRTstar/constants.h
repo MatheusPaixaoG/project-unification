@@ -11,21 +11,12 @@ const float START_POS_Y = 0.0; // 1120;
 const float END_POS_X = 3500.0;
 const float END_POS_Y = 0.0;
 const float NODE_RADIUS = 1.0;
-const float END_DIST_THRESHOLD = 20.0;
-const float BOT_CLEARANCE = 1.5 * BOT_RADIUS;
+const float END_DIST_THRESHOLD = 100.0;
+const float BOT_CLEARANCE = 1 * BOT_RADIUS;
 const float BOT_TURN_RADIUS = 7;
-const float RRTSTAR_NEIGHBOR_FACTOR = 2.5;
+const float RRTSTAR_NEIGHBOR_FACTOR = 4;
 const bool BOT_FOLLOW_DUBIN = false;
 const double GOAL_SAMPLING_PROB = 0.05;
 const int RADIUS = 5;
-
-// void setInitialPos(Point startPosition) {
-//   START_POS_X = (float) startPosition.x();
-//   START_POS_Y = (float) startPosition.y();
-// };
-// void setFinalPos(Point endPosition) {
-//   END_POS_X = (float) endPosition.x();
-//   END_POS_Y = (float) endPosition.y();
-// }
 
 #endif // PROJECT_UNIFICATION_CONSTANTS_H
