@@ -1,4 +1,5 @@
 #include "RRTstar.h"
+#include <QRandomGenerator>
 #include <random>
 
 const double EPS = 1e-6;
@@ -48,19 +49,23 @@ T randomCoordinate(T low, T high) {
  */
 Node* RRTSTAR::getRandomNode() {
   Node* ret;
-  double random_sample =
-      randomCoordinate(0.0,
-                       1.0); // Comentar daqui até a linha 58 para testar sem misturar os algoritmos
-  Point point;
-  if ((random_sample - GOAL_SAMPLING_PROB) <= EPS and !pathFound) {
-    point = Point(END_POS_X, END_POS_Y) + Point(RADIUS, RADIUS);
-  } else {
-    point = Point(randomCoordinate((float) 0.0, WORLD_WIDTH),
-                  randomCoordinate((float) 0.0, WORLD_HEIGHT));
-  }
-  // Point point(drand48() * WORLD_WIDTH, drand48() * WORLD_HEIGHT); // Descomentar essa parte para
+  // double random_sample =
+  //     randomCoordinate(0.0,
+  //                      1.0); // Comentar daqui até a linha 58 para testar sem misturar os
+  //                      algoritmos
+  // Point point;
+  // if ((random_sample - GOAL_SAMPLING_PROB) <= EPS and !pathFound) {
+  //   point = Point(END_POS_X, END_POS_Y) + Point(END_DIST_THRESHOLD, END_DIST_THRESHOLD);
+  // } else {
+  //   point = Point(randomCoordinate(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2),
+  //                 randomCoordinate(-WORLD_WIDTH / 2, WORLD_WIDTH / 2));
+  // }
+  Point point(
+      QRandomGenerator::global()->bounded((int) -WORLD_HEIGHT / 2, (int) WORLD_HEIGHT / 2),
+      QRandomGenerator::global()->bounded((int) -WORLD_WIDTH / 2,
+                                          (int) WORLD_WIDTH / 2)); // Descomentar essa parte para
   // testar sem misturar os algoritmos
-  float orient = drand48() * 2 * 3.142;
+  float orient = (float) QRandomGenerator::global()->generateDouble() * 2 * 3.142;
   if (point.x() >= 0 && point.x() <= WORLD_WIDTH && point.y() >= 0 && point.y() <= WORLD_HEIGHT &&
       orient > 0 && orient < 2 * 3.142) {
     ret = new Node;

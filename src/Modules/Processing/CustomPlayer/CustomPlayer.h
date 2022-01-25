@@ -24,7 +24,10 @@ class CustomPlayer : public Processing {
     SharedOptional<Frame> frame;
     SharedOptional<Robot> robot;
     SharedOptional<Field> field;
-    SharedOptional<Point> target = Point(-4500, -3000);
+    SharedOptional<Point> target = Point(-4500, -3000); // field->bottomLeft()
+    SharedOptional<vector<Point>> pathNodesList;
+    SharedOptional<Point> objective = Point(3500, 0.0);
+    SharedOptional<int> currentNode = -1;
     SharedValue<QSet<Qt::Key>> keys;
   };
   SharedWrapper<Shared, std::mutex> shared;
@@ -33,6 +36,9 @@ class CustomPlayer : public Processing {
   std::optional<Frame> frame;
   std::optional<Robot> robot;
   std::optional<Point> target;
+  std::optional<vector<Point>> pathNodesList;
+  std::optional<Point> objective;
+  std::optional<int> currentNode;
 
   SSLNavigation sslNavigation;
   VSSNavigation vssNavigation;
@@ -41,6 +47,9 @@ class CustomPlayer : public Processing {
   void receiveField(const Field& field);
   void receiveFrame(const Frame& frame);
   void receiveTarget(const Point& target);
+  void receivePathNodesList(const vector<Point>& pathNodesList);
+  void receiveObjective(const Point& objective);
+  void receiveCurrentNode(const int& currentNode);
 };
 
 #endif // PROJECT_UNIFICATION_CUSTOMPLAYER_H
