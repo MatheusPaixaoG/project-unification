@@ -24,10 +24,10 @@ class CustomPlayer : public Processing {
     SharedOptional<Frame> frame;
     SharedOptional<Robot> robot;
     SharedOptional<Field> field;
-    SharedOptional<Point> target = Point(-4500, -3000); // field->bottomLeft()
-    SharedOptional<vector<Point>> pathNodesList;
-    SharedOptional<Point> objective = Point(3500, 0.0);
-    SharedOptional<int> currentNode = -1;
+    // SharedOptional<Point> target = Point(-4500, -3000); // field->bottomLeft()
+    // SharedOptional<vector<Point>> pathNodesList;
+    // SharedOptional<Point> objective = Point(3500, 0.0);
+    // SharedOptional<int> currentNode = -1;
     SharedValue<QSet<Qt::Key>> keys;
   };
   SharedWrapper<Shared, std::mutex> shared;
@@ -35,10 +35,10 @@ class CustomPlayer : public Processing {
   std::optional<Field> field;
   std::optional<Frame> frame;
   std::optional<Robot> robot;
-  std::optional<Point> target;
-  std::optional<vector<Point>> pathNodesList;
-  std::optional<Point> objective;
-  std::optional<int> currentNode;
+  Point target = Point(-4500, -3000); // field->bottomLeft()
+  vector<Point> pathNodesList;
+  Point objective;
+  int currentNode;
   GameVisualizer::Key pathKey;
 
   SSLNavigation sslNavigation;

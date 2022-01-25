@@ -291,8 +291,8 @@ void CustomPlayer::exec() {
   if (ballWithRobot) { // Verifica se o robô está com a bola
     // cout << "ballWithRobot antes do GoToPoint\n";
     vector<Point> pathNodes = vector<Point>();
-    if (shared->target.has_value()) {
-      if (targ.distTo(shared->target.get()) >= 20.0) {
+    if (!target.isNull()) {
+      if (targ.distTo(target) >= 20.0) {
         // vector<Point> pathNodes = vector<Point>();
         receiveTarget(targ);
         RRTSTAR* rrtstar = new RRTSTAR;
@@ -394,7 +394,7 @@ void CustomPlayer::exec() {
         }
         pathKey.draw([path = pathNodes](GameVisualizerPainter2D* f) {
           if (!path.empty()) {
-            for (int i = 0; i < path.size() - 1; ++i) {
+            for (int i = 0; i < (int) path.size() - 1; ++i) {
               f->drawFilledCircle(path[i], 30, Color::Magenta);
               f->drawLine(path[i], path[i + 1], Color::Red, 10);
             }
@@ -429,32 +429,25 @@ void CustomPlayer::exec() {
         //     emit sendCommand(sslNavigation.run(robot.value(), command));
         //   }
         // }
-        receiveObjective(pathNodes.at(pathNodes.size() - 1));
-        receiveCurrentNode((int) pathNodes.size() - 1);
-        cout << "currentNode: " << shared->currentNode.value() << endl;
+        currentNode = (int) pathNodesList.size() - 1;
+        objective = pathNodesList.at(currentNode);
+        cout << "currentNode: " << currentNode << endl;
       }
     }
 
-    // Point pointObjective = Point(objective->x(), objective->y());
-    if (robot->position().distTo(shared->objective.value()) <= 45 &&
-        shared->currentNode.value() - 1 >= 0) {
-      receiveCurrentNode(shared->currentNode.value() - 1);
-      receiveObjective(pathNodes.at(shared->currentNode.value()));
+    if (robot->position().distTo(objective) <= 100 && currentNode - 1 >= 0) {
+      currentNode = currentNode - 1;
+      cout << "currentNode: " << currentNode << endl;
+      objective = pathNodesList.at(currentNode);
     }
-    SSLMotion::GoToPoint motion(shared->objective.value(),
+    SSLMotion::GoToPoint motion(objective,
                                 (field->enemyGoalInsideBottom() - robot->position()).angle(),
                                 true);
-    // cout << "ballWithRobot depois do GoToPoint\n";
     SSLRobotCommand command(motion);
     command.set_dribbler(true);
     if (robot->distSquaredTo(field->enemyPenaltyAreaCenter()) <= 1.29712e+04) {
-      // SSLMotion::RotateOnSelf motion((field->enemyGoalInsideBottom() -
-      // robot->position()).angle()); SSLRobotCommand command(motion);
       command.set_dribbler(true);
       if (field->enemyPenaltyAreaContains(frame->ball().position())) {
-        // SSLMotion::RotateOnSelf m((field->enemyGoalInsideBottom() -
-        // robot->position()).angle());
-        // SSLRobotCommand c(m);
         command.set_dribbler(false);
         command.set_front(true);
         command.set_kickSpeed(3);
@@ -466,45 +459,19 @@ void CustomPlayer::exec() {
       emit sendCommand(sslNavigation.run(robot.value(), command));
     }
   } else {
-    // cout << "ballNotWithRobot antes do GoToPoint\n";
     if (field->enemyGoalContains(frame->ball().position())) {
-      // cout << "ballNotWithRobot dentro do if antes do GoToPoint\n";
       SSLMotion::GoToPoint motion(field->center(), field->center().angle(), true);
       SSLRobotCommand command(motion);
-      // cout << "ballNotWithRobot dentro do if depois do GoToPoint\n";
       emit sendCommand(sslNavigation.run(robot.value(), command));
     } else {
-      // cout << "ballNotWithRobot dentro do else antes do GoToPoint\n";
       SSLMotion::GoToPoint motion(frame->ball().position(),
                                   (frame->ball().position() - robot->position()).angle(),
                                   true);
       SSLRobotCommand command(motion);
-      // cout << "ballNotWithRobot dentro do else depois do GoToPoint\n";
       command.set_dribbler(true);
       emit sendCommand(sslNavigation.run(robot.value(), command));
     }
   }
-  // if (robot->angleTo(field->enemyGoalInsideCenter()) <= 1 && ballWithRobot) {
-  //   std::cout << "a";
-  //   SSLMotion::RotateOnSelf motion(field->enemyGoalInsideCenter().angle());
-  //   SSLRobotCommand command(motion);
-  //   command.set_kickSpeed(100000);
-  //   emit sendCommand(sslNavigation.run(robot.value(), command));
-  // }
-  // if (field->enemyPenaltyAreaContains(
-  //         robot->position())) { // Aqui seria útil usar a função para ver se um ponto está dentro
-  //         de
-  //   // uma área qualquer do campo
-  //   SSLMotion::GoToPoint motion(robot->position(), field->enemyGoalInsideCenter().angle(), true);
-  //   SSLRobotCommand command(motion);
-  //   command.set_kickSpeed(1000);
-  //   emit sendCommand(sslNavigation.run(robot.value(), command));
-  // }
-  // if (field->enemyGoalContains(frame->ball().position())) {
-  //   SSLMotion::GoToPoint motion(field->center(), field->center().angle(), true);
-  //   SSLRobotCommand command(motion);
-  //   emit sendCommand(sslNavigation.run(robot.value(), command));
-  // }
   // TODO: here...
   // emit sendCommand(sslNavigation.run(robot.value(), command));
 }
@@ -518,20 +485,20 @@ void CustomPlayer::receiveFrame(const Frame& frame) {
   runInParallel();
 }
 
-void CustomPlayer::receiveTarget(const Point& target) {
-  shared->target = target;
+void CustomPlayer::receiveTarget(const Point& targetReceived) {
+  target = targetReceived;
 }
 
-void CustomPlayer::receivePathNodesList(const vector<Point>& pathNodesList) {
-  shared->pathNodesList = pathNodesList;
+void CustomPlayer::receivePathNodesList(const vector<Point>& pathNodesListReceived) {
+  pathNodesList = pathNodesListReceived;
 }
 
-void CustomPlayer::receiveObjective(const Point& objective) {
-  shared->objective = objective;
+void CustomPlayer::receiveObjective(const Point& objectiveReceived) {
+  objective = objectiveReceived;
 }
 
-void CustomPlayer::receiveCurrentNode(const int& currentNode) {
-  shared->currentNode = currentNode;
+void CustomPlayer::receiveCurrentNode(const int& currentNodeReceived) {
+  currentNode = currentNodeReceived;
 }
 
 static_block {
