@@ -53,20 +53,27 @@ void CustomPlayer::exec() {
   if (ballWithRobot) { // Verifica se o robô está com a bola
     if (robot->distSquaredTo(field->enemyPenaltyAreaCenter()) <= 1.29712e+04) {
       currentState = 2;
-      SSLMotion::GoToPoint m(robot->position(),
-                             (field->enemyGoalInsideBottom() - robot->position()).angle(),
-                             true);
-      SSLRobotCommand c(m);
-      c.set_dribbler(true);
-      if (field->enemyPenaltyAreaContains(frame->ball().position())) {
-        c.set_dribbler(false);
-        c.set_front(true);
-        c.set_kickSpeed(3);
-        emit sendCommand(sslNavigation.run(robot.value(), c));
-      } else {
-        emit sendCommand(sslNavigation.run(robot.value(), c));
-      }
     } else {
+      currentState = 1;
+    }
+  } else {
+    if (field->enemyGoalContains(frame->ball().position())) {
+      currentState = 3;
+    } else {
+      currentState = 0;
+    }
+  }
+  switch (currentState) {
+    case 0: {
+      SSLMotion::GoToPoint motion(frame->ball().position(),
+                                  (frame->ball().position() - robot->position()).angle(),
+                                  true);
+      SSLRobotCommand command(motion);
+      command.set_dribbler(true);
+      emit sendCommand(sslNavigation.run(robot.value(), command));
+      break;
+    }
+    case 1: {
       if (!target.isNull()) {
         vector<Point> pathNodes = vector<Point>();
         Point targ = field->enemyPenaltyAreaCenter();
@@ -115,12 +122,26 @@ void CustomPlayer::exec() {
                                   true);
       SSLRobotCommand command(motion);
       command.set_dribbler(true);
-      currentState = 1;
       emit sendCommand(sslNavigation.run(robot.value(), command));
+      break;
     }
-  } else {
-    if (field->enemyGoalContains(frame->ball().position())) {
-      currentState = 3;
+    case 2: {
+      SSLMotion::GoToPoint m(robot->position(),
+                             (field->enemyGoalInsideBottom() - robot->position()).angle(),
+                             true);
+      SSLRobotCommand c(m);
+      c.set_dribbler(true);
+      if (field->enemyPenaltyAreaContains(frame->ball().position())) {
+        c.set_dribbler(false);
+        c.set_front(true);
+        c.set_kickSpeed(3);
+        emit sendCommand(sslNavigation.run(robot.value(), c));
+      } else {
+        emit sendCommand(sslNavigation.run(robot.value(), c));
+      }
+      break;
+    }
+    case 3: {
       vector<Point> pathNodes = vector<Point>();
       Point targ = Point(1.0, 1.0);
       if (!target.isNull()) {
@@ -175,15 +196,9 @@ void CustomPlayer::exec() {
       SSLMotion::GoToPoint motion(objective, (field->center() - robot->position()).angle(), true);
       SSLRobotCommand command(motion);
       emit sendCommand(sslNavigation.run(robot.value(), command));
-    } else {
-      currentState = 0;
-      SSLMotion::GoToPoint motion(frame->ball().position(),
-                                  (frame->ball().position() - robot->position()).angle(),
-                                  true);
-      SSLRobotCommand command(motion);
-      command.set_dribbler(true);
-      emit sendCommand(sslNavigation.run(robot.value(), command));
+      break;
     }
+    default: cout << "currentState default: " << currentState << endl;
   }
   // TODO: here...
   // emit sendCommand(sslNavigation.run(robot.value(), command));
