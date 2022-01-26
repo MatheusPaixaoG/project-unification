@@ -50,252 +50,13 @@ void CustomPlayer::exec() {
   }
   double distRobotBall = robot->distSquaredTo(frame->ball().position());
   bool ballWithRobot = distRobotBall <= 1.49712e+04;
-  Point targ = field->enemyPenaltyAreaCenter();
-  // receiveTarget(field->bottomLeft());
-  // if (shared->target.has_value()) {
-  //   if (targ.distTo(shared->target.get()) >= 20.0) {
-  //     vector<Point> pathNodes = vector<Point>();
-  //     receiveTarget(targ);
-  //     RRTSTAR* rrtstar = new RRTSTAR;
-  //     for (int o = 1; o < frame->allies().size(); o++) {
-  //       Point topRight = Point(frame->allies().at(o).position().x() + BOT_RADIUS,
-  //                              frame->allies().at(o).position().y() + BOT_RADIUS);
-  //       Point bottomLeft = Point(frame->allies().at(o).position().x() - BOT_RADIUS,
-  //                                frame->allies().at(o).position().y() - BOT_RADIUS);
-  //       rrtstar->obstacles->addObstacle(topRight, bottomLeft);
-  //     }
-  //     // for (int k = 0; k < (int) rrtstar->obstacles->obstacles.size(); k++) {
-  //     //   cout << "rrtstar->obstacles->obstacles[" << k << "].first: ("
-  //     //        << rrtstar->obstacles->obstacles[k].first.x() << ", "
-  //     //        << rrtstar->obstacles->obstacles[k].first.y() << ")" << endl;
-  //     //   cout << "rrtstar->obstacles->obstacles[" << k << "].second: ("
-  //     //        << rrtstar->obstacles->obstacles[k].second.x() << ", "
-  //     //        << rrtstar->obstacles->obstacles[k].second.y() << ")" << endl;
-  //     // }
-  //     rrtstar->setMaxIterations(1800);
-  //     rrtstar->setStepSize(120);
-  //     cout << "field->enemyPenaltyAreaCenter(): (" << field->enemyPenaltyAreaCenter().x() << ", "
-  //          << field->enemyPenaltyAreaCenter().y() << ")" << endl;
-  //     cout << "robot->position(): (" << robot->position().x() << ", " << robot->position().y()
-  //          << ")" << endl;
-  //     // setInitialPos(robot->position());
-  //     // rrtstar->setStartPos(robot->position());
-  //     cout << "frame->ball().position(): (" << frame->ball().position().x() << ", "
-  //          << frame->ball().position().y() << ")" << endl;
-  //     // setFinalPos(frame->ball().position());
-  //     // rrtstar->setEndPos(frame->ball().position());
-
-  //     cout << "path antes: " << endl;
-  //     for (int g = 0; g < (int) rrtstar->path.size(); g++) {
-  //       cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
-  //            << rrtstar->path[g]->position.y() << ")" << endl;
-  //     }
-  //     // RRTSTAR Algorithm
-  //     for (int i = 0; i < rrtstar->max_iter; i++) {
-  //       Node* q = rrtstar->getRandomNode();
-  //       if (q) {
-  //         Node* qNearest = rrtstar->nearest(q->position);
-  //         if (rrtstar->distance(q->position, qNearest->position) > rrtstar->step_size) {
-  //           Point newConfigPosOrient;
-  //           // DubinsPath path;
-  //           if (BOT_FOLLOW_DUBIN) {
-  //             // newConfigPosOrient = rrtstar->newDubinConfig(q, qNearest, path);
-  //           } else {
-  //             newConfigPosOrient = rrtstar->newConfig(q, qNearest);
-  //           }
-  //           Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
-  //           if (!rrtstar->obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
-  //             Node* qNew = new Node;
-  //             qNew->position = newConfigPos;
-  //             qNew->orientation = newConfigPosOrient.angle();
-  //             // qNew->path = path;
-
-  //             vector<Node*> Qnear;
-  //             rrtstar->near(qNew->position, rrtstar->step_size * RRTSTAR_NEIGHBOR_FACTOR, Qnear);
-  //             // qDebug() << "Found Nearby " << Qnear.size() << "\n";
-  //             Node* qMin = qNearest;
-  //             double cmin = rrtstar->Cost(qNearest) + rrtstar->PathCost(qNearest, qNew);
-  //             for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-  //               Node* qNear = Qnear[j];
-  //               if (!rrtstar->obstacles->isSegmentInObstacle(qNear->position, qNew->position) &&
-  //                   (rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew)) < cmin) {
-  //                 qMin = qNear;
-  //                 cmin = rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew);
-  //               }
-  //             }
-  //             rrtstar->add(qMin, qNew);
-
-  //             for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-  //               Node* qNear = Qnear[j];
-  //               if (!rrtstar->obstacles->isSegmentInObstacle(qNew->position, qNear->position) &&
-  //                   (rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear)) <
-  //                   rrtstar->Cost(qNear)) {
-  //                 Node* qParent = qNear->parent;
-  //                 // Remove edge between qParent and qNear
-  //                 qParent->children.erase(
-  //                     std::remove(qParent->children.begin(), qParent->children.end(), qNear),
-  //                     qParent->children.end());
-
-  //                 // Add edge between qNew and qNear
-  //                 qNear->cost = rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear);
-  //                 qNear->parent = qNew;
-  //                 qNew->children.push_back(qNear);
-  //               }
-  //             }
-  //           }
-  //         }
-  //       }
-  //       if (rrtstar->reached()) {
-  //         cout << "Reached destination" << endl;
-  //         // ui->statusBox->setText(tr("Reached Destination!"));
-  //         break;
-  //       }
-  //       // renderArea->update();
-  //       qApp->processEvents();
-  //     }
-
-  //     Node* q;
-  //     if (rrtstar->reached()) {
-  //       q = rrtstar->lastNode;
-  //     } else {
-  //       // if not reached yet, then shortestPath will start from the closest node to end point.
-  //       q = rrtstar->nearest(rrtstar->endPos);
-  //       cout << "Exceeded max iterations!" << endl;
-  //     }
-  //     // generate shortest path to destination.
-  //     while (q != NULL) {
-  //       pathNodes.push_back(q->position);
-  //       rrtstar->path.push_back(q);
-  //       q = q->parent;
-  //     }
-  //     receivePathNodesList(pathNodes);
-  //     cout << "path depois: " << endl;
-  //     for (int g = 0; g < (int) rrtstar->path.size(); g++) {
-  //       cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
-  //            << rrtstar->path[g]->position.y() << ")" << endl;
-  //       cout << "pathNodes.size(): " << pathNodes.size() << endl;
-  //       // cout << "pathNodesList[" << g << "]: (" << pathNodesList->at(g).x() << ", "
-  //       //      << pathNodesList->at(g).y() << ")" << endl;
-  //     }
-  //   }
-  // }
-
-  // receiveTarget(field->bottomLeft());
-  // if (shared->target.has_value()) {
-  //   if (targ.distTo(shared->target.get()) >= 20.0) {
-  //     receiveTarget(targ);
-  //     getInput(robot->position(), field->center(), 1, frame->allies(), frame->enemies());
-  //     prepareInput();
-  //     nodeCnt = 1;
-  //     nodes.push_back(start);
-  //     parents.push_back(0);
-  //     cost.push_back(0);
-  //     jumps.push_back(-1.0);
-  //     for (int w = 0; w < 3; w++) {
-  //       RRT();
-  //     }
-  //     for (int g = 0; g < (int) nodes.size(); g++) {
-  //       cout << "nodes[" << g << "]: (" << nodes[g].x << ", " << nodes[g].y << ")" << endl;
-  //     }
-  //   }
-  // }
-  // RRTSTAR* rrtstar = new RRTSTAR;
-  // rrtstar->setMaxIterations(50);
-  // rrtstar->setStepSize(75);
-  // cout << "robot->position(): (" << robot->position().x() << ", " << robot->position().y() << ")"
-  //      << endl;
-  // // setInitialPos(robot->position());
-  // // rrtstar->setStartPos(robot->position());
-  // cout << "frame->ball().position(): (" << frame->ball().position().x() << ", "
-  //      << frame->ball().position().y() << ")" << endl;
-  // // setFinalPos(frame->ball().position());
-  // // rrtstar->setEndPos(frame->ball().position());
-
-  // cout << "nodes antes: " << endl;
-  // for (int g = 0; g < (int) rrtstar->nodes.size(); g++) {
-  //   cout << "rrtstar->nodes[" << g << "]: (" << rrtstar->nodes[g]->position.x() << ", "
-  //        << rrtstar->nodes[g]->position.y() << ")" << endl;
-  // }
-  // // RRTSTAR Algorithm
-  // for (int i = 0; i < rrtstar->max_iter; i++) {
-  //   Node* q = rrtstar->getRandomNode();
-  //   if (q) {
-  //     Node* qNearest = rrtstar->nearest(q->position);
-  //     if (rrtstar->distance(q->position, qNearest->position) > rrtstar->step_size) {
-  //       Point newConfigPosOrient;
-  //       // DubinsPath path;
-  //       if (BOT_FOLLOW_DUBIN) {
-  //         // newConfigPosOrient = rrtstar->newDubinConfig(q, qNearest, path);
-  //       } else {
-  //         newConfigPosOrient = rrtstar->newConfig(q, qNearest);
-  //       }
-  //       Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
-  //       if (!rrtstar->obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
-  //         Node* qNew = new Node;
-  //         qNew->position = newConfigPos;
-  //         qNew->orientation = newConfigPosOrient.angle();
-  //         // qNew->path = path;
-
-  //         vector<Node*> Qnear;
-  //         rrtstar->near(qNew->position, rrtstar->step_size * RRTSTAR_NEIGHBOR_FACTOR, Qnear);
-  //         qDebug() << "Found Nearby " << Qnear.size() << "\n";
-  //         Node* qMin = qNearest;
-  //         double cmin = rrtstar->Cost(qNearest) + rrtstar->PathCost(qNearest, qNew);
-  //         for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-  //           Node* qNear = Qnear[j];
-  //           if (!rrtstar->obstacles->isSegmentInObstacle(qNear->position, qNew->position) &&
-  //               (rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew)) < cmin) {
-  //             qMin = qNear;
-  //             cmin = rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew);
-  //           }
-  //         }
-  //         rrtstar->add(qMin, qNew);
-
-  //         for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-  //           Node* qNear = Qnear[j];
-  //           if (!rrtstar->obstacles->isSegmentInObstacle(qNew->position, qNear->position) &&
-  //               (rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear)) < rrtstar->Cost(qNear)) {
-  //             Node* qParent = qNear->parent;
-  //             // Remove edge between qParent and qNear
-  //             qParent->children.erase(
-  //                 std::remove(qParent->children.begin(), qParent->children.end(), qNear),
-  //                 qParent->children.end());
-
-  //             // Add edge between qNew and qNear
-  //             qNear->cost = rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear);
-  //             qNear->parent = qNew;
-  //             qNew->children.push_back(qNear);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   if (rrtstar->reached()) {
-  //     cout << "Reached destination" << endl;
-  //     // ui->statusBox->setText(tr("Reached Destination!"));
-  //     break;
-  //   }
-  //   // renderArea->update();
-  //   qApp->processEvents();
-  // }
-
-  // cout << "nodes depois: " << endl;
-  // for (int g = 0; g < (int) rrtstar->nodes.size(); g++) {
-  //   cout << "field->bottomLeft(): (" << field->bottomLeft().x() << ", " <<
-  //   field->bottomLeft().y()
-  //        << ")" << endl;
-  //   cout << "rrtstar->nodes[" << g << "]: (" << rrtstar->nodes[g]->position.x() << ", "
-  //        << rrtstar->nodes[g]->position.y() << ")" << endl;
-  // }
-
   if (ballWithRobot) { // Verifica se o robô está com a bola
-    // cout << "ballWithRobot antes do GoToPoint\n";
     vector<Point> pathNodes = vector<Point>();
+    Point targ = field->enemyPenaltyAreaCenter();
     if (!target.isNull()) {
       if (targ.distTo(target) >= 20.0) {
-        // vector<Point> pathNodes = vector<Point>();
-        receiveTarget(targ);
         RRTSTAR* rrtstar = new RRTSTAR;
+        receiveTarget(targ);
         for (int o = 1; o < frame->allies().size(); o++) {
           Point topRight = Point(frame->allies().at(o).position().x() + BOT_RADIUS,
                                  frame->allies().at(o).position().y() + BOT_RADIUS);
@@ -305,18 +66,6 @@ void CustomPlayer::exec() {
         }
         rrtstar->setMaxIterations(1800);
         rrtstar->setStepSize(100);
-        cout << "field->enemyPenaltyAreaCenter(): (" << field->enemyPenaltyAreaCenter().x() << ", "
-             << field->enemyPenaltyAreaCenter().y() << ")" << endl;
-        cout << "robot->position(): (" << robot->position().x() << ", " << robot->position().y()
-             << ")" << endl;
-        cout << "frame->ball().position(): (" << frame->ball().position().x() << ", "
-             << frame->ball().position().y() << ")" << endl;
-
-        cout << "path antes: " << endl;
-        for (int g = 0; g < (int) rrtstar->path.size(); g++) {
-          cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
-               << rrtstar->path[g]->position.y() << ")" << endl;
-        }
         // RRTSTAR Algorithm
         for (int i = 0; i < rrtstar->max_iter; i++) {
           Node* q = rrtstar->getRandomNode();
@@ -401,44 +150,20 @@ void CustomPlayer::exec() {
             f->drawFilledCircle(path.back(), 30, Color::Magenta);
           }
         });
-
-        // for (int g = (int) pathNodes.size() - 1; g > -1; g--) {
-        //   Point objective = pathNodes.at(g);
-        //   if (robot->position().distTo(objective) <= 60 && g + 1 <= (int) pathNodes.size()) {
-        //     objective = pathNodes.at(g + 1);
-        //   }
-        //   SSLMotion::GoToPoint motion(objective, (objective - robot->position()).angle(), true);
-        //   // cout << "ballWithRobot depois do GoToPoint\n";
-        //   SSLRobotCommand command(motion);
-        //   command.set_dribbler(true);
-        //   if (robot->distSquaredTo(field->enemyPenaltyAreaCenter()) <= 1.29712e+04) {
-        //     // SSLMotion::RotateOnSelf motion((field->enemyGoalInsideBottom() -
-        //     // robot->position()).angle()); SSLRobotCommand command(motion);
-        //     command.set_dribbler(true);
-        //     if (field->enemyPenaltyAreaContains(frame->ball().position())) {
-        //       // SSLMotion::RotateOnSelf m((field->enemyGoalInsideBottom() -
-        //       // robot->position()).angle()); SSLRobotCommand c(m);
-        //       command.set_dribbler(false);
-        //       command.set_front(true);
-        //       command.set_kickSpeed(3);
-        //       emit sendCommand(sslNavigation.run(robot.value(), command));
-        //     } else {
-        //       emit sendCommand(sslNavigation.run(robot.value(), command));
-        //     }
-        //   } else {
-        //     emit sendCommand(sslNavigation.run(robot.value(), command));
-        //   }
-        // }
         currentNode = (int) pathNodesList.size() - 1;
         objective = pathNodesList.at(currentNode);
         cout << "currentNode: " << currentNode << endl;
+        delete rrtstar;
       }
     }
-
     if (robot->position().distTo(objective) <= 100 && currentNode - 1 >= 0) {
       currentNode = currentNode - 1;
       cout << "currentNode: " << currentNode << endl;
       objective = pathNodesList.at(currentNode);
+    }
+    bool lastNode = false;
+    if (currentNode == 0) {
+      lastNode = true;
     }
     SSLMotion::GoToPoint motion(objective,
                                 (field->enemyGoalInsideBottom() - robot->position()).angle(),
@@ -460,7 +185,135 @@ void CustomPlayer::exec() {
     }
   } else {
     if (field->enemyGoalContains(frame->ball().position())) {
-      SSLMotion::GoToPoint motion(field->center(), field->center().angle(), true);
+      vector<Point> pathNodes = vector<Point>();
+      Point targ = Point(1.0, 1.0);
+      if (!target.isNull()) {
+        a = 1;
+        if (targ.distTo(target) >= 20.0) {
+          SSLMotion::GoToPoint motion(field->enemyPenaltyAreaCenter(),
+                                      (field->center() - robot->position()).angle(),
+                                      true);
+          SSLRobotCommand command(motion);
+          emit sendCommand(sslNavigation.run(robot.value(), command));
+          RRTSTAR* rrtstar = new RRTSTAR;
+          receiveTarget(targ);
+          rrtstar->setInitialPos(Point(3500.0, 0.0));
+          rrtstar->setFinalPos(Point(0.0, 0.0));
+          rrtstar->nodes.clear();
+          rrtstar->initialize();
+          for (int o = 1; o < frame->allies().size(); o++) {
+            Point topRight = Point(frame->allies().at(o).position().x() + BOT_RADIUS,
+                                   frame->allies().at(o).position().y() + BOT_RADIUS);
+            Point bottomLeft = Point(frame->allies().at(o).position().x() - BOT_RADIUS,
+                                     frame->allies().at(o).position().y() - BOT_RADIUS);
+            rrtstar->obstacles->addObstacle(topRight, bottomLeft);
+          }
+          rrtstar->setMaxIterations(1800);
+          rrtstar->setStepSize(100);
+          // RRTSTAR Algorithm
+          for (int i = 0; i < rrtstar->max_iter; i++) {
+            Node* q = rrtstar->getRandomNode();
+            if (q) {
+              Node* qNearest = rrtstar->nearest(q->position);
+              if (rrtstar->distance(q->position, qNearest->position) > rrtstar->step_size) {
+                Point newConfigPosOrient;
+                newConfigPosOrient = rrtstar->newConfig(q, qNearest);
+                Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
+                if (!rrtstar->obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
+                  Node* qNew = new Node;
+                  qNew->position = newConfigPos;
+                  qNew->orientation = newConfigPosOrient.angle();
+                  vector<Node*> Qnear;
+                  rrtstar->near(qNew->position,
+                                rrtstar->step_size * RRTSTAR_NEIGHBOR_FACTOR,
+                                Qnear);
+                  Node* qMin = qNearest;
+                  double cmin = rrtstar->Cost(qNearest) + rrtstar->PathCost(qNearest, qNew);
+                  for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
+                    Node* qNear = Qnear[j];
+                    if (!rrtstar->obstacles->isSegmentInObstacle(qNear->position, qNew->position) &&
+                        (rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew)) < cmin) {
+                      qMin = qNear;
+                      cmin = rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew);
+                    }
+                  }
+                  rrtstar->add(qMin, qNew);
+
+                  for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
+                    Node* qNear = Qnear[j];
+                    if (!rrtstar->obstacles->isSegmentInObstacle(qNew->position, qNear->position) &&
+                        (rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear)) <
+                            rrtstar->Cost(qNear)) {
+                      Node* qParent = qNear->parent;
+                      // Remove edge between qParent and qNear
+                      qParent->children.erase(
+                          std::remove(qParent->children.begin(), qParent->children.end(), qNear),
+                          qParent->children.end());
+
+                      // Add edge between qNew and qNear
+                      qNear->cost = rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear);
+                      qNear->parent = qNew;
+                      qNew->children.push_back(qNear);
+                    }
+                  }
+                }
+              }
+            }
+            if (rrtstar->reached()) {
+              cout << "Reached destination" << endl;
+              break;
+            }
+            qApp->processEvents();
+          }
+
+          Node* q;
+          if (rrtstar->reached()) {
+            q = rrtstar->lastNode;
+          } else {
+            // if not reached yet, then shortestPath will start from the closest node to end point
+            q = rrtstar->nearest(rrtstar->endPos);
+            cout << "Exceeded max iterations!" << endl;
+          }
+          // generate shortest path to destination.
+          while (q != NULL) {
+            pathNodes.push_back(q->position);
+            rrtstar->path.push_back(q);
+            q = q->parent;
+          }
+          receivePathNodesList(pathNodes);
+          cout << "path depois: " << endl;
+          for (int g = 0; g < (int) rrtstar->path.size(); g++) {
+            cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
+                 << rrtstar->path[g]->position.y() << ")" << endl;
+            cout << "pathNodes.size(): " << pathNodes.size() << endl;
+          }
+          pathKey.draw([path = pathNodes](GameVisualizerPainter2D* f) {
+            if (!path.empty()) {
+              for (int i = 0; i < (int) path.size() - 1; ++i) {
+                f->drawFilledCircle(path[i], 30, Color::Magenta);
+                f->drawLine(path[i], path[i + 1], Color::Red, 10);
+              }
+              f->drawFilledCircle(path.back(), 30, Color::Magenta);
+            }
+          });
+          currentNode = (int) pathNodesList.size() - 1;
+          objective = pathNodesList.at(currentNode);
+          cout << "currentNode: " << currentNode << endl;
+          delete rrtstar;
+        }
+      }
+
+      if (robot->position().distTo(objective) <= 100 && currentNode - 1 >= 0) {
+        currentNode = currentNode - 1;
+        cout << "currentNode: " << currentNode << endl;
+        objective = pathNodesList.at(currentNode);
+      }
+      bool lastNode = false;
+      if (currentNode == 0) {
+        lastNode = true;
+      }
+
+      SSLMotion::GoToPoint motion(objective, (field->center() - robot->position()).angle(), true);
       SSLRobotCommand command(motion);
       emit sendCommand(sslNavigation.run(robot.value(), command));
     } else {

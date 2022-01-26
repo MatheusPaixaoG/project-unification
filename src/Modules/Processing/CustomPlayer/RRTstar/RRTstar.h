@@ -31,6 +31,8 @@ class RRTSTAR {
   bool reached();
   void setStepSize(int step);
   void setMaxIterations(int iter);
+  void setInitialPos(Point initialPos);
+  void setFinalPos(Point finalPos);
   void deleteNodes(Node* root);
   Obstacles* obstacles;
   vector<Node*> nodes;

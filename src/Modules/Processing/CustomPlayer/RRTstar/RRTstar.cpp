@@ -190,6 +190,16 @@ void RRTSTAR::setMaxIterations(int iter) {
   max_iter = iter;
 }
 
+void RRTSTAR::setInitialPos(Point initialPos) {
+  startPos.setX(initialPos.x());
+  startPos.setY(initialPos.y());
+}
+
+void RRTSTAR::setFinalPos(Point finalPos) {
+  endPos.setX(finalPos.x());
+  endPos.setY(finalPos.x());
+}
+
 /**
  * @brief Delete all nodes using DFS technique.
  * @param root

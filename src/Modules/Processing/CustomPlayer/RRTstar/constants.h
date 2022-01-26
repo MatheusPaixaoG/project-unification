@@ -19,4 +19,6 @@ const bool BOT_FOLLOW_DUBIN = false;
 const double GOAL_SAMPLING_PROB = 0.05;
 const int RADIUS = 5;
 
+void setInitialPos(Point initialPos);
+
 #endif // PROJECT_UNIFICATION_CONSTANTS_H
