@@ -24,7 +24,7 @@ RRTSTAR::RRTSTAR() {
 }
 
 /**
- * @brief Initialize root node of RRTSTAR.
+ * @brief Inicializa o nó raíz de RRT*
  */
 void RRTSTAR::initialize() {
   root = new Node;
@@ -36,7 +36,7 @@ void RRTSTAR::initialize() {
   nodes.push_back(root);
 }
 
-template <typename T> // Returns a random number in [low, high]
+template <typename T> // Retorna um número aleatório no intervalo [low, high]
 T randomCoordinate(T low, T high) {
   random_device random_device;
   mt19937 engine{random_device()};
@@ -45,14 +45,12 @@ T randomCoordinate(T low, T high) {
 }
 
 /**
- * @brief Generate a random node in the field.
+ * @brief Gera um nó aleatório no campo
  * @return
  */
 Node* RRTSTAR::getRandomNode() {
   Node* ret;
-  double random_sample = randomCoordinate(0.0,
-                                          1.0); // Comentar daqui até a linha 58 para testar sem
-                                                // misturar os algoritmos
+  double random_sample = randomCoordinate(0.0, 1.0);
   Point point;
   if ((random_sample - GOAL_SAMPLING_PROB) <= EPS and !pathFound) {
     point = Point(END_POS_X, END_POS_Y) + Point(END_DIST_THRESHOLD, END_DIST_THRESHOLD);
@@ -60,12 +58,9 @@ Node* RRTSTAR::getRandomNode() {
     point = Point(randomCoordinate(-WORLD_WIDTH / 2, WORLD_WIDTH / 2),
                   randomCoordinate(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2));
   }
-  // Point point(
-  //     QRandomGenerator::global()->bounded((int) -WORLD_WIDTH / 2, (int) WORLD_WIDTH / 2),
-  //     QRandomGenerator::global()->bounded((int) -WORLD_HEIGHT / 2,
-  //                                         (int) WORLD_HEIGHT / 2)); // Descomentar essa parte
-  //                                         para
-  // testar sem misturar os algoritmos
+  if (point.distTo(endPos) <= 150) {
+    point = endPos;
+  }
   float orient = (float) QRandomGenerator::global()->generateDouble() * 2 * 3.142;
   if (point.x() >= -WORLD_WIDTH / 2 && point.x() <= WORLD_WIDTH / 2 &&
       point.y() >= -WORLD_HEIGHT / 2 && point.y() <= WORLD_HEIGHT / 2 && orient > 0 &&
@@ -79,7 +74,7 @@ Node* RRTSTAR::getRandomNode() {
 }
 
 /**
- * @brief Helper method to find distance between two positions.
+ * @brief Método auxiliar para achar a distancia entre dois pontos
  * @param p
  * @param q
  * @return
@@ -90,7 +85,7 @@ double RRTSTAR::distance(Point& p, Point& q) {
 }
 
 /**
- * @brief Get nearest node from a given configuration/position.
+ * @brief Pega o nó mais próximo aa partir de uma dada configuração/posição
  * @param point
  * @return
  */
@@ -108,7 +103,7 @@ Node* RRTSTAR::nearest(Point point) {
 }
 
 /**
- * @brief Get neighborhood nodes of a given configuration/position.
+ * @brief Pega nós vizinhos de uma dada configuração/posição
  * @param point
  * @param radius
  * @param out_nodes
@@ -124,7 +119,8 @@ void RRTSTAR::near(Point point, float radius, vector<Node*>& out_nodes) {
 }
 
 /**
- * @brief Find a configuration at a distance step_size from nearest node to random node.
+ * @brief Acha uma configuração a uma distância step_size a partir do nó mais próximo para o nó
+ * aleatório
  * @param q
  * @param qNearest
  * @return
@@ -140,7 +136,7 @@ Point RRTSTAR::newConfig(Node* q, Node* qNearest) {
 }
 
 /**
- * @brief Return trajectory cost.
+ * @brief Retorna o custo da trajetória
  * @param q
  * @return
  */
@@ -149,7 +145,7 @@ double RRTSTAR::Cost(Node* q) {
 }
 
 /**
- * @brief Compute path cost.
+ * @brief Computa o custo do caminho
  * @param qFrom
  * @param qTo
  * @return
@@ -159,7 +155,7 @@ double RRTSTAR::PathCost(Node* qFrom, Node* qTo) {
 }
 
 /**
- * @brief Add a node to the tree.
+ * @brief Adiciona o nó na árvore
  * @param qNearest
  * @param qNew
  */
@@ -172,7 +168,7 @@ void RRTSTAR::add(Node* qNearest, Node* qNew) {
 }
 
 /**
- * @brief Check if the last node is close to the end position.
+ * @brief Checa se o último nó está próximo de endPos
  * @return
  */
 bool RRTSTAR::reached() {
@@ -202,7 +198,7 @@ void RRTSTAR::setFinalPos(Point finalPos) {
 }
 
 /**
- * @brief Delete all nodes using DFS technique.
+ * @brief Deleta todos os nós usando DFS
  * @param root
  */
 void RRTSTAR::deleteNodes(Node* root0) {
@@ -244,12 +240,11 @@ void RRTSTAR::RRTstarAlgorithm() {
             if (!obstacles->isSegmentInObstacle(qNew->position, qNear->position) &&
                 (Cost(qNew) + PathCost(qNew, qNear)) < Cost(qNear)) {
               Node* qParent = qNear->parent;
-              // Remove edge between qParent and qNear
+              // Remove a aresta entre qParent e qNear
               qParent->children.erase(
                   std::remove(qParent->children.begin(), qParent->children.end(), qNear),
                   qParent->children.end());
-
-              // Add edge between qNew and qNear
+              // Adiciona uma aresta entre qNew e qNear
               qNear->cost = Cost(qNew) + PathCost(qNew, qNear);
               qNear->parent = qNew;
               qNew->children.push_back(qNear);
@@ -262,8 +257,6 @@ void RRTSTAR::RRTstarAlgorithm() {
       cout << "Reached destination" << endl;
       i = 0;
       setMaxIterations(200);
-      // break;
     }
-    // qApp->processEvents();
   }
 }

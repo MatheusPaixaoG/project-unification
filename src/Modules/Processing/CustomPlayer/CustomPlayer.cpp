@@ -57,6 +57,9 @@ void CustomPlayer::exec() {
       if (targ.distTo(target) >= 20.0) {
         RRTSTAR* rrtstar = new RRTSTAR;
         receiveTarget(targ);
+        rrtstar->setInitialPos(robot->position());
+        rrtstar->nodes.clear();
+        rrtstar->initialize();
         for (int o = 1; o < frame->allies().size(); o++) {
           Point topRight = Point(frame->allies().at(o).position().x() + BOT_RADIUS,
                                  frame->allies().at(o).position().y() + BOT_RADIUS);
@@ -72,23 +75,18 @@ void CustomPlayer::exec() {
         if (rrtstar->reached()) {
           q = rrtstar->lastNode;
         } else {
-          // if not reached yet, then shortestPath will start from the closest node to end point.
+          // Se ainda não chegou ao objetivo, o menor caminho vai começar do nó mais próximo de
+          // endPos
           q = rrtstar->nearest(rrtstar->endPos);
           cout << "Exceeded max iterations!" << endl;
         }
-        // generate shortest path to destination.
+        // Gera o menor caminho para o objetivo
         while (q != NULL) {
           pathNodes.push_back(q->position);
           rrtstar->path.push_back(q);
           q = q->parent;
         }
         receivePathNodesList(pathNodes);
-        cout << "path depois: " << endl;
-        for (int g = 0; g < (int) rrtstar->path.size(); g++) {
-          cout << "rrtstar->path[" << g << "]: (" << rrtstar->path[g]->position.x() << ", "
-               << rrtstar->path[g]->position.y() << ")" << endl;
-          cout << "pathNodes.size(): " << pathNodes.size() << endl;
-        }
         pathKey.draw([path = pathNodes](GameVisualizerPainter2D* f) {
           if (!path.empty()) {
             for (int i = 0; i < (int) path.size() - 1; ++i) {
@@ -100,13 +98,11 @@ void CustomPlayer::exec() {
         });
         currentNode = (int) pathNodesList.size() - 1;
         objective = pathNodesList.at(currentNode);
-        cout << "currentNode: " << currentNode << endl;
         delete rrtstar;
       }
     }
     if (robot->position().distTo(objective) <= 100 && currentNode - 1 >= 0) {
       currentNode = currentNode - 1;
-      cout << "currentNode: " << currentNode << endl;
       objective = pathNodesList.at(currentNode);
     }
     bool lastNode = false;
@@ -144,7 +140,7 @@ void CustomPlayer::exec() {
           emit sendCommand(sslNavigation.run(robot.value(), command));
           RRTSTAR* rrtstar = new RRTSTAR;
           receiveTarget(targ);
-          rrtstar->setInitialPos(Point(3500.0, 0.0));
+          rrtstar->setInitialPos(robot->position());
           rrtstar->setFinalPos(Point(0.0, 0.0));
           rrtstar->nodes.clear();
           rrtstar->initialize();
@@ -163,11 +159,12 @@ void CustomPlayer::exec() {
           if (rrtstar->reached()) {
             q = rrtstar->lastNode;
           } else {
-            // if not reached yet, then shortestPath will start from the closest node to end point
+            // Se ainda não chegou ao objetivo, o menor caminho vai começar do nó mais próximo de
+            // endPos
             q = rrtstar->nearest(rrtstar->endPos);
             cout << "Exceeded max iterations!" << endl;
           }
-          // generate shortest path to destination.
+          // Gera o menor caminho para o objetivo
           while (q != NULL) {
             pathNodes.push_back(q->position);
             rrtstar->path.push_back(q);
