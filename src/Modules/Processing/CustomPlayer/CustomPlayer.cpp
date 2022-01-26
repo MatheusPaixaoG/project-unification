@@ -64,62 +64,10 @@ void CustomPlayer::exec() {
                                    frame->allies().at(o).position().y() - BOT_RADIUS);
           rrtstar->obstacles->addObstacle(topRight, bottomLeft);
         }
-        rrtstar->setMaxIterations(1800);
+        rrtstar->setMaxIterations(2300);
         rrtstar->setStepSize(100);
         // RRTSTAR Algorithm
-        for (int i = 0; i < rrtstar->max_iter; i++) {
-          Node* q = rrtstar->getRandomNode();
-          if (q) {
-            Node* qNearest = rrtstar->nearest(q->position);
-            if (rrtstar->distance(q->position, qNearest->position) > rrtstar->step_size) {
-              Point newConfigPosOrient;
-              newConfigPosOrient = rrtstar->newConfig(q, qNearest);
-              Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
-              if (!rrtstar->obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
-                Node* qNew = new Node;
-                qNew->position = newConfigPos;
-                qNew->orientation = newConfigPosOrient.angle();
-                vector<Node*> Qnear;
-                rrtstar->near(qNew->position, rrtstar->step_size * RRTSTAR_NEIGHBOR_FACTOR, Qnear);
-                Node* qMin = qNearest;
-                double cmin = rrtstar->Cost(qNearest) + rrtstar->PathCost(qNearest, qNew);
-                for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-                  Node* qNear = Qnear[j];
-                  if (!rrtstar->obstacles->isSegmentInObstacle(qNear->position, qNew->position) &&
-                      (rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew)) < cmin) {
-                    qMin = qNear;
-                    cmin = rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew);
-                  }
-                }
-                rrtstar->add(qMin, qNew);
-
-                for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-                  Node* qNear = Qnear[j];
-                  if (!rrtstar->obstacles->isSegmentInObstacle(qNew->position, qNear->position) &&
-                      (rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear)) <
-                          rrtstar->Cost(qNear)) {
-                    Node* qParent = qNear->parent;
-                    // Remove edge between qParent and qNear
-                    qParent->children.erase(
-                        std::remove(qParent->children.begin(), qParent->children.end(), qNear),
-                        qParent->children.end());
-
-                    // Add edge between qNew and qNear
-                    qNear->cost = rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear);
-                    qNear->parent = qNew;
-                    qNew->children.push_back(qNear);
-                  }
-                }
-              }
-            }
-          }
-          if (rrtstar->reached()) {
-            cout << "Reached destination" << endl;
-            break;
-          }
-          qApp->processEvents();
-        }
-
+        rrtstar->RRTstarAlgorithm();
         Node* q;
         if (rrtstar->reached()) {
           q = rrtstar->lastNode;
@@ -188,7 +136,6 @@ void CustomPlayer::exec() {
       vector<Point> pathNodes = vector<Point>();
       Point targ = Point(1.0, 1.0);
       if (!target.isNull()) {
-        a = 1;
         if (targ.distTo(target) >= 20.0) {
           SSLMotion::GoToPoint motion(field->enemyPenaltyAreaCenter(),
                                       (field->center() - robot->position()).angle(),
@@ -208,64 +155,10 @@ void CustomPlayer::exec() {
                                      frame->allies().at(o).position().y() - BOT_RADIUS);
             rrtstar->obstacles->addObstacle(topRight, bottomLeft);
           }
-          rrtstar->setMaxIterations(1800);
+          rrtstar->setMaxIterations(2300);
           rrtstar->setStepSize(100);
           // RRTSTAR Algorithm
-          for (int i = 0; i < rrtstar->max_iter; i++) {
-            Node* q = rrtstar->getRandomNode();
-            if (q) {
-              Node* qNearest = rrtstar->nearest(q->position);
-              if (rrtstar->distance(q->position, qNearest->position) > rrtstar->step_size) {
-                Point newConfigPosOrient;
-                newConfigPosOrient = rrtstar->newConfig(q, qNearest);
-                Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
-                if (!rrtstar->obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
-                  Node* qNew = new Node;
-                  qNew->position = newConfigPos;
-                  qNew->orientation = newConfigPosOrient.angle();
-                  vector<Node*> Qnear;
-                  rrtstar->near(qNew->position,
-                                rrtstar->step_size * RRTSTAR_NEIGHBOR_FACTOR,
-                                Qnear);
-                  Node* qMin = qNearest;
-                  double cmin = rrtstar->Cost(qNearest) + rrtstar->PathCost(qNearest, qNew);
-                  for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-                    Node* qNear = Qnear[j];
-                    if (!rrtstar->obstacles->isSegmentInObstacle(qNear->position, qNew->position) &&
-                        (rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew)) < cmin) {
-                      qMin = qNear;
-                      cmin = rrtstar->Cost(qNear) + rrtstar->PathCost(qNear, qNew);
-                    }
-                  }
-                  rrtstar->add(qMin, qNew);
-
-                  for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
-                    Node* qNear = Qnear[j];
-                    if (!rrtstar->obstacles->isSegmentInObstacle(qNew->position, qNear->position) &&
-                        (rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear)) <
-                            rrtstar->Cost(qNear)) {
-                      Node* qParent = qNear->parent;
-                      // Remove edge between qParent and qNear
-                      qParent->children.erase(
-                          std::remove(qParent->children.begin(), qParent->children.end(), qNear),
-                          qParent->children.end());
-
-                      // Add edge between qNew and qNear
-                      qNear->cost = rrtstar->Cost(qNew) + rrtstar->PathCost(qNew, qNear);
-                      qNear->parent = qNew;
-                      qNew->children.push_back(qNear);
-                    }
-                  }
-                }
-              }
-            }
-            if (rrtstar->reached()) {
-              cout << "Reached destination" << endl;
-              break;
-            }
-            qApp->processEvents();
-          }
-
+          rrtstar->RRTstarAlgorithm();
           Node* q;
           if (rrtstar->reached()) {
             q = rrtstar->lastNode;

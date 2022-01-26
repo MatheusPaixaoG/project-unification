@@ -1,5 +1,6 @@
 #include "RRTstar.h"
 #include <QRandomGenerator>
+#include <iostream>
 #include <random>
 
 const double EPS = 1e-6;
@@ -209,4 +210,60 @@ void RRTSTAR::deleteNodes(Node* root0) {
     deleteNodes(root0->children[i]);
   }
   delete root0;
+}
+
+void RRTSTAR::RRTstarAlgorithm() {
+  for (int i = 0; i < max_iter; i++) {
+    Node* q = getRandomNode();
+    if (q) {
+      Node* qNearest = nearest(q->position);
+      if (distance(q->position, qNearest->position) > step_size) {
+        Point newConfigPosOrient;
+        newConfigPosOrient = newConfig(q, qNearest);
+        Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
+        if (!obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
+          Node* qNew = new Node;
+          qNew->position = newConfigPos;
+          qNew->orientation = newConfigPosOrient.angle();
+          vector<Node*> Qnear;
+          near(qNew->position, step_size * RRTSTAR_NEIGHBOR_FACTOR, Qnear);
+          Node* qMin = qNearest;
+          double cmin = Cost(qNearest) + PathCost(qNearest, qNew);
+          for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
+            Node* qNear = Qnear[j];
+            if (!obstacles->isSegmentInObstacle(qNear->position, qNew->position) &&
+                (Cost(qNear) + PathCost(qNear, qNew)) < cmin) {
+              qMin = qNear;
+              cmin = Cost(qNear) + PathCost(qNear, qNew);
+            }
+          }
+          add(qMin, qNew);
+
+          for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
+            Node* qNear = Qnear[j];
+            if (!obstacles->isSegmentInObstacle(qNew->position, qNear->position) &&
+                (Cost(qNew) + PathCost(qNew, qNear)) < Cost(qNear)) {
+              Node* qParent = qNear->parent;
+              // Remove edge between qParent and qNear
+              qParent->children.erase(
+                  std::remove(qParent->children.begin(), qParent->children.end(), qNear),
+                  qParent->children.end());
+
+              // Add edge between qNew and qNear
+              qNear->cost = Cost(qNew) + PathCost(qNew, qNear);
+              qNear->parent = qNew;
+              qNew->children.push_back(qNear);
+            }
+          }
+        }
+      }
+    }
+    if (reached()) {
+      cout << "Reached destination" << endl;
+      i = 0;
+      setMaxIterations(200);
+      // break;
+    }
+    // qApp->processEvents();
+  }
 }
