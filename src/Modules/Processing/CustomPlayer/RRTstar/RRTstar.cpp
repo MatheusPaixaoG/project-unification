@@ -260,3 +260,22 @@ void RRTSTAR::RRTstarAlgorithm() {
     }
   }
 }
+
+vector<Point> RRTSTAR::generatePath(vector<Point> pathNodes) {
+  Node* q;
+  if (reached()) {
+    q = lastNode;
+  } else {
+    // Se ainda não chegou ao objetivo, o menor caminho vai começar do nó mais próximo de
+    // endPos
+    q = nearest(endPos);
+    cout << "Exceeded max iterations!" << endl;
+  }
+  // Gera o menor caminho para o objetivo
+  while (q != NULL) {
+    pathNodes.push_back(q->position);
+    path.push_back(q);
+    q = q->parent;
+  }
+  return pathNodes;
+}

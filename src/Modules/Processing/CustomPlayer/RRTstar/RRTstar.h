@@ -35,6 +35,7 @@ class RRTSTAR {
   void setFinalPos(Point finalPos);
   void deleteNodes(Node* root);
   void RRTstarAlgorithm();
+  vector<Point> generatePath(vector<Point> pathNodes);
   Obstacles* obstacles;
   vector<Node*> nodes;
   vector<Node*> path;

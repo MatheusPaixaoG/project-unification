@@ -39,6 +39,7 @@ class CustomPlayer : public Processing {
   vector<Point> pathNodesList;
   Point objective;
   int currentNode;
+  int currentState;
   GameVisualizer::Key pathKey;
 
   SSLNavigation sslNavigation;
