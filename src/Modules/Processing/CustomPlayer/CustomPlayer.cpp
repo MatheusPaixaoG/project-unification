@@ -59,6 +59,8 @@ void CustomPlayer::exec() {
   } else {
     if (field->enemyGoalContains(frame->ball().position())) {
       currentState = 3;
+    } else if (field->enemyPenaltyAreaContains(frame->ball().position())) {
+      currentState = 4;
     } else {
       currentState = 0;
     }
@@ -134,20 +136,24 @@ void CustomPlayer::exec() {
       break;
     }
     case 2: {
-      Robot closestAlly = *frame->allies().closestTo(field->enemyGoalOutsideTop());
-      SSLMotion::RotateOnSelf m((closestAlly.position() - robot->position()).angle());
+      // closestAlly = *frame->allies().removedById(robot->id()).closestTo
+      Robot closestAlly =
+          *frame->allies().removedById(robot->id()).closestTo(field->enemyGoalOutsideTop());
+      SSLMotion::RotateOnSelf m((closestAlly.position() - robot->position()).angle() - 0.03);
       SSLRobotCommand c(m);
       c.set_dribbler(true);
-      cout << "closestAlly: " << closestAlly.id() << endl;
-      // if (robot->angleTo(closestAlly) == 0) {
-      //   c.set_dribbler(false);
-      //   c.set_front(true);
-      //   c.set_kickSpeed(2);
-      //   emit sendCommand(sslNavigation.run(robot.value(), c));
-      // }
-      // c.set_dribbler(false);
-      // c.set_front(true);
-      // c.set_kickSpeed(3);
+      cout << "closestAlly: " << closestAlly.id()
+           << endl; // talvez seja bom eu criar um behaviour pra que, depois de eu passar a bola pro
+      // meu aliado (ou seja, quando eu não estiver com a bola e ela estiver dentro da
+      // área), eu fique parado até que a bola esteja dentro do gol. Depois que a bola
+      // estiver dentro do gol, o robô volta para o centro do campo.
+      cout << "robot.id()" << robot->id() << endl;
+      cout << "abs(robot->angleTo(closestAlly)): " << abs(robot->angleTo(closestAlly)) << endl;
+      if (abs(robot->angleTo(closestAlly)) <= 0.07) {
+        c.set_dribbler(false);
+        c.set_front(true);
+        c.set_kickSpeed(2);
+      }
       emit sendCommand(sslNavigation.run(robot.value(), c));
       break;
     }

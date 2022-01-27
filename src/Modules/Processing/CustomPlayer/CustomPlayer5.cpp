@@ -51,7 +51,7 @@ void CustomPlayer5::exec() {
   double distRobotBall = robot->distSquaredTo(frame->ball().position());
   bool ballWithRobot = distRobotBall <= 1.49712e+04;
   // Robot robotAlly0 = *frame->allies().findById(0);
-  SSLMotion::GoToPoint motion(Point(4200.0, 640.0),
+  SSLMotion::GoToPoint motion(Point(4200.0, 440.0),
                               (field->enemyPenaltyAreaCenter() - robot->position()).angle(),
                               true);
   SSLRobotCommand command(motion);
