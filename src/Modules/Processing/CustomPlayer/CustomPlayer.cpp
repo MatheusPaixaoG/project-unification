@@ -139,10 +139,10 @@ void CustomPlayer::exec() {
       SSLRobotCommand c(m);
       c.set_dribbler(true);
       cout << "closestAlly: " << closestAlly.id() << endl;
-      // if (robot->angleTo(closestAlly) <= 1) {
+      // if (robot->angleTo(closestAlly) == 0) {
       //   c.set_dribbler(false);
       //   c.set_front(true);
-      //   c.set_kickSpeed(3);
+      //   c.set_kickSpeed(2);
       //   emit sendCommand(sslNavigation.run(robot.value(), c));
       // }
       // c.set_dribbler(false);
