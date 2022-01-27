@@ -51,7 +51,7 @@ void CustomPlayer::exec() {
   double distRobotBall = robot->distSquaredTo(frame->ball().position());
   bool ballWithRobot = distRobotBall <= 1.49712e+04;
   if (ballWithRobot) { // Verifica se o robô está com a bola
-    if (robot->distSquaredTo(field->enemyPenaltyAreaCenter()) <= 1.29712e+04) {
+    if (robot->distTo(field->enemyPenaltyAreaCenter()) <= 150) {
       currentState = 2;
     } else {
       currentState = 1;
@@ -90,6 +90,13 @@ void CustomPlayer::exec() {
                                      frame->allies().at(o).position().y() - BOT_RADIUS);
             rrtstar->obstacles->addObstacle(topRight, bottomLeft);
           }
+          for (int o = 0; o < frame->enemies().size(); o++) {
+            Point topRight = Point(frame->enemies().at(o).position().x() + BOT_RADIUS,
+                                   frame->enemies().at(o).position().y() + BOT_RADIUS);
+            Point bottomLeft = Point(frame->enemies().at(o).position().x() - BOT_RADIUS,
+                                     frame->enemies().at(o).position().y() - BOT_RADIUS);
+            rrtstar->obstacles->addObstacle(topRight, bottomLeft);
+          }
           rrtstar->setMaxIterations(2300);
           rrtstar->setStepSize(100);
           // RRTSTAR Algorithm
@@ -109,7 +116,7 @@ void CustomPlayer::exec() {
           delete rrtstar;
         }
       }
-      if (robot->position().distTo(objective) <= 100 && currentNode - 1 >= 0) {
+      if (robot->position().distTo(objective) <= 150 && currentNode - 1 >= 0) {
         currentNode = currentNode - 1;
         objective = pathNodesList.at(currentNode);
       }
@@ -118,7 +125,8 @@ void CustomPlayer::exec() {
         lastNode = true;
       }
       SSLMotion::GoToPoint motion(objective,
-                                  (field->enemyGoalInsideBottom() - robot->position()).angle(),
+                                  (field->enemyGoalInsideBottom() - robot->position()).angle() -
+                                      3.14,
                                   true);
       SSLRobotCommand command(motion);
       command.set_dribbler(true);
@@ -126,19 +134,21 @@ void CustomPlayer::exec() {
       break;
     }
     case 2: {
-      SSLMotion::GoToPoint m(robot->position(),
-                             (field->enemyGoalInsideBottom() - robot->position()).angle(),
-                             true);
+      Robot closestAlly = *frame->allies().closestTo(field->enemyGoalOutsideTop());
+      SSLMotion::RotateOnSelf m((closestAlly.position() - robot->position()).angle());
       SSLRobotCommand c(m);
       c.set_dribbler(true);
-      if (field->enemyPenaltyAreaContains(frame->ball().position())) {
-        c.set_dribbler(false);
-        c.set_front(true);
-        c.set_kickSpeed(3);
-        emit sendCommand(sslNavigation.run(robot.value(), c));
-      } else {
-        emit sendCommand(sslNavigation.run(robot.value(), c));
-      }
+      cout << "closestAlly: " << closestAlly.id() << endl;
+      // if (robot->angleTo(closestAlly) <= 1) {
+      //   c.set_dribbler(false);
+      //   c.set_front(true);
+      //   c.set_kickSpeed(3);
+      //   emit sendCommand(sslNavigation.run(robot.value(), c));
+      // }
+      // c.set_dribbler(false);
+      // c.set_front(true);
+      // c.set_kickSpeed(3);
+      emit sendCommand(sslNavigation.run(robot.value(), c));
       break;
     }
     case 3: {
@@ -162,6 +172,13 @@ void CustomPlayer::exec() {
                                    frame->allies().at(o).position().y() + BOT_RADIUS);
             Point bottomLeft = Point(frame->allies().at(o).position().x() - BOT_RADIUS,
                                      frame->allies().at(o).position().y() - BOT_RADIUS);
+            rrtstar->obstacles->addObstacle(topRight, bottomLeft);
+          }
+          for (int o = 0; o < frame->enemies().size(); o++) {
+            Point topRight = Point(frame->enemies().at(o).position().x() + BOT_RADIUS,
+                                   frame->enemies().at(o).position().y() + BOT_RADIUS);
+            Point bottomLeft = Point(frame->enemies().at(o).position().x() - BOT_RADIUS,
+                                     frame->enemies().at(o).position().y() - BOT_RADIUS);
             rrtstar->obstacles->addObstacle(topRight, bottomLeft);
           }
           rrtstar->setMaxIterations(2300);

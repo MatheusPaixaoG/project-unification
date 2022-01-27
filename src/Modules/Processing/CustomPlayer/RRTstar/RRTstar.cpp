@@ -58,7 +58,7 @@ Node* RRTSTAR::getRandomNode() {
     point = Point(randomCoordinate(-WORLD_WIDTH / 2, WORLD_WIDTH / 2),
                   randomCoordinate(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2));
   }
-  if (point.distTo(endPos) <= 150) {
+  if (point.distTo(endPos) <= 250) {
     point = endPos;
   }
   float orient = (float) QRandomGenerator::global()->generateDouble() * 2 * 3.142;
