@@ -136,19 +136,18 @@ void CustomPlayer::exec() {
       break;
     }
     case 2: {
-      // closestAlly = *frame->allies().removedById(robot->id()).closestTo
       Robot closestAlly =
           *frame->allies().removedById(robot->id()).closestTo(field->enemyGoalOutsideTop());
       SSLMotion::RotateOnSelf m((closestAlly.position() - robot->position()).angle() - 0.03);
       SSLRobotCommand c(m);
       c.set_dribbler(true);
-      cout << "closestAlly: " << closestAlly.id()
-           << endl; // talvez seja bom eu criar um behaviour pra que, depois de eu passar a bola pro
+      // cout << "closestAlly: " << closestAlly.id()
+      // << endl; // talvez seja bom eu criar um behaviour pra que, depois de eu passar a bola pro
       // meu aliado (ou seja, quando eu não estiver com a bola e ela estiver dentro da
       // área), eu fique parado até que a bola esteja dentro do gol. Depois que a bola
       // estiver dentro do gol, o robô volta para o centro do campo.
-      cout << "robot.id()" << robot->id() << endl;
-      cout << "abs(robot->angleTo(closestAlly)): " << abs(robot->angleTo(closestAlly)) << endl;
+      // cout << "robot.id()" << robot->id() << endl;
+      // cout << "abs(robot->angleTo(closestAlly)): " << abs(robot->angleTo(closestAlly)) << endl;
       if (abs(robot->angleTo(closestAlly)) <= 0.07) {
         c.set_dribbler(false);
         c.set_front(true);
@@ -218,6 +217,13 @@ void CustomPlayer::exec() {
 
       SSLMotion::GoToPoint motion(objective, (field->center() - robot->position()).angle(), true);
       SSLRobotCommand command(motion);
+      emit sendCommand(sslNavigation.run(robot.value(), command));
+      break;
+    }
+    case 4: {
+      SSLMotion::RotateOnSelf motion((frame->ball().position() - robot->position()).angle());
+      SSLRobotCommand command(motion);
+      cout << "currentState default: " << currentState << endl;
       emit sendCommand(sslNavigation.run(robot.value(), command));
       break;
     }

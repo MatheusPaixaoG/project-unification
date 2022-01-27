@@ -51,12 +51,37 @@ void CustomPlayer5::exec() {
   double distRobotBall = robot->distSquaredTo(frame->ball().position());
   bool ballWithRobot = distRobotBall <= 1.49712e+04;
   // Robot robotAlly0 = *frame->allies().findById(0);
-  SSLMotion::GoToPoint motion(Point(4200.0, 440.0),
-                              (field->enemyPenaltyAreaCenter() - robot->position()).angle(),
-                              true);
-  SSLRobotCommand command(motion);
-  command.set_dribbler(true);
-  emit sendCommand(sslNavigation.run(robot.value(), command));
+  if (ballWithRobot) { // Verifica se o robô está com a bola
+    currentState = 1;
+  } else {
+    currentState = 0;
+  }
+  switch (currentState) {
+    case 0: {
+      SSLMotion::GoToPoint motion(Point(4200.0, 440.0),
+                                  (field->enemyPenaltyAreaCenter() - robot->position()).angle(),
+                                  true);
+      SSLRobotCommand command(motion);
+      command.set_dribbler(true);
+      emit sendCommand(sslNavigation.run(robot.value(), command));
+      break;
+    }
+    case 1: {
+      SSLMotion::RotateOnSelf motion((field->enemyGoalInsideBottom() - robot->position()).angle());
+      SSLRobotCommand command(motion);
+      command.set_dribbler(true);
+      cout << "robot->angleTo(field->enemyGoalInsideBottom()): "
+           << robot->angleTo(field->enemyGoalInsideBottom()) << endl;
+      if (abs(robot->angleTo(field->enemyGoalInsideBottom())) <= 0.01) {
+        command.set_dribbler(false);
+        command.set_front(true);
+        command.set_kickSpeed(2);
+      }
+      emit sendCommand(sslNavigation.run(robot.value(), command));
+      break;
+    }
+    default: cout << "currentState default: " << currentState << endl;
+  }
   // if (ballWithRobot) { // Verifica se o robô está com a bola
   //   if (robot->distTo(field->enemyPenaltyAreaCenter()) <= 150) {
   //     currentState = 2;
