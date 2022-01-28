@@ -212,19 +212,31 @@ void RRTSTAR::RRTstarAlgorithm() {
   for (int i = 0; i < max_iter; i++) {
     Node* q = getRandomNode();
     if (q) {
-      Node* qNearest = nearest(q->position);
+      Node* qNearest = nearest(q->position); // Pega o nó da árvore mais próximo do ponto gerado
       if (distance(q->position, qNearest->position) > step_size) {
         Point newConfigPosOrient;
-        newConfigPosOrient = newConfig(q, qNearest);
+        newConfigPosOrient = newConfig(
+            q,
+            qNearest); // Se o nó gerado estiver a uma distância de mais de stepSize do nó mais
+                       // próximo, então gera outro nó a uma distância stepSize e na mesma direção
         Point newConfigPos(newConfigPosOrient.x(), newConfigPosOrient.y());
-        if (!obstacles->isSegmentInObstacle(newConfigPos, qNearest->position)) {
+        if (!obstacles->isSegmentInObstacle(
+                newConfigPos,
+                qNearest
+                    ->position)) { // Se o segmento entre o novo ponto e o ponto mais próximo não
+                                   // passar por um obstáculo, então pode ser adicionado na árvore
           Node* qNew = new Node;
           qNew->position = newConfigPos;
           qNew->orientation = newConfigPosOrient.angle();
           vector<Node*> Qnear;
-          near(qNew->position, step_size * RRTSTAR_NEIGHBOR_FACTOR, Qnear);
+          near(qNew->position,
+               step_size * RRTSTAR_NEIGHBOR_FACTOR,
+               Qnear); // Verifica quais nós da árvore estão a uma determinada distância do novo nó
           Node* qMin = qNearest;
-          double cmin = Cost(qNearest) + PathCost(qNearest, qNew);
+          double cmin =
+              Cost(qNearest) + PathCost(qNearest, qNew); // Calcula o custo para chegar ao novo nó
+          // No loop abaixo, ele recalcula a distância para todos os nós próximos encontrados do
+          // novo nó até a raiz da árvore
           for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
             Node* qNear = Qnear[j];
             if (!obstacles->isSegmentInObstacle(qNear->position, qNew->position) &&
@@ -233,7 +245,7 @@ void RRTSTAR::RRTstarAlgorithm() {
               cmin = Cost(qNear) + PathCost(qNear, qNew);
             }
           }
-          add(qMin, qNew);
+          add(qMin, qNew); // Adiciona o nó na árvore ao nó com o menor custo para chegar à raiz
 
           for (int j = 0; j < 0 || (unsigned) j < Qnear.size(); j++) {
             Node* qNear = Qnear[j];
@@ -253,7 +265,8 @@ void RRTSTAR::RRTstarAlgorithm() {
         }
       }
     }
-    if (reached()) {
+    if (reached()) { // Se chegou ao objetivo, então roda por mais 200 iterações para tentar
+                     // melhorar o caminho
       cout << "Reached destination" << endl;
       i = 0;
       setMaxIterations(200);
@@ -263,7 +276,7 @@ void RRTSTAR::RRTstarAlgorithm() {
 
 vector<Point> RRTSTAR::generatePath(vector<Point> pathNodes) {
   Node* q;
-  if (reached()) {
+  if (reached()) { // Se chegou ao objetivo, então começa do último nó
     q = lastNode;
   } else {
     // Se ainda não chegou ao objetivo, o menor caminho vai começar do nó mais próximo de
